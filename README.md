@@ -73,7 +73,6 @@ The app looks for a `.env` in this order and uses the first it finds:
 
 1. `.env` in the current working directory
 2. `~/.config/jira-tui/.env` (recommended for a global install)
-3. `.env` one/two levels above the package
 
 See [`.env.example`](.env.example) for a ready-to-copy template:
 
