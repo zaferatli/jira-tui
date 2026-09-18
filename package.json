@@ -1,6 +1,6 @@
 {
   "name": "jira-tui",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A lazygit-style panelled Jira terminal client built with Fennel and the Fengari Lua VM",
   "bin": {
     "jira-tui": "./bin/jira-tui.js"
