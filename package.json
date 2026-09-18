@@ -1,19 +1,40 @@
 {
   "name": "jira-tui",
   "version": "0.1.0",
-  "description": "lazygit-style panelled Jira terminal client (app logic in Fennel on Fengari Lua VM)",
-  "private": true,
+  "description": "A lazygit-style panelled Jira terminal client built with Fennel and the Fengari Lua VM",
   "bin": {
     "jira-tui": "./bin/jira-tui.js"
   },
-  "main": "bin/jira-tui.js",
+  "main": "./bin/jira-tui.js",
   "scripts": {
-    "start": "node bin/jira-tui.js"
+    "start": "node ./bin/jira-tui.js",
+    "build": "echo \"No build step required\"",
+    "prepublishOnly": "npm test",
+    "dryrun": "npm pack --dry-run && npm link && jira-tui",
+    "test": "node --check ./bin/jira-tui.js"
   },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "blessed": "^0.1.81",
     "dotenv": "^16.4.5",
     "fengari": "^0.1.5",
     "fengari-interop": "^0.1.4"
-  }
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "jira",
+    "tui",
+    "terminal",
+    "cli",
+    "fennel",
+    "lua"
+  ],
+  "license": "MIT"
 }
