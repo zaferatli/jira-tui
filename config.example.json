@@ -1,4 +1,5 @@
 {
+  "editor": "code --wait",
   "keys": {
     "comment": ["c"],
     "browser": ["w"],

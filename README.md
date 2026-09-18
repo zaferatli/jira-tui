@@ -19,8 +19,9 @@ keyboard.
   clipboard; `Shift-d` removes; `Shift-h` hides everything currently visible.
 - **Local filter + server search** — `/` narrows the on-screen list instantly
   (no network); `s` runs full-text search across Jira.
-- **nvim integration** — `e` edits the description in nvim; `:wq` saves to
-  Jira automatically when changed.
+- **External editor** — `e` edits the description in your configured editor
+  (`code --wait` by default; nvim, Cursor, vim, … via `config.editor` / `$EDITOR`);
+  save & close writes back to Jira when changed.
 - **Attachments** — download and open images/files; preload with `Shift-i`
   while on VPN, view offline later with `i`.
 - **Offline cache** — when the network/VPN is down, the last successful
@@ -54,8 +55,9 @@ src/
 
 ## Install
 
-Requirements: Node.js; `nvim` for `e`; `open` / `pbcopy` on macOS for browser
-and clipboard shortcuts.
+Requirements: Node.js; a terminal/GUI editor for `e` (default `code --wait`;
+see `editor` in config); `open` / `pbcopy` on macOS for browser and clipboard
+shortcuts.
 
 ```sh
 npm install jira-tui -g
@@ -109,7 +111,7 @@ Press `?` in the app for the live list (reflects your config).
 | `t` | Transitions tab — j/k to pick, Enter to apply (optional multiline comment + assignee) |
 | `a` | Assign (empty = unassign; optional multiline comment) |
 | `Shift-a` | Assign to yourself |
-| `e` | Edit description in nvim — `:wq` saves to Jira if changed |
+| `e` | Edit description in external editor — save & close writes to Jira if changed |
 | `h` | Hide selected issue (unhide in Hidden view) — stored in `~/.config/jira-tui/hidden.json` |
 | `Shift-h` | Hide **all** currently visible issues (unhide all when in Hidden view) |
 | `y` | Copy issue key (e.g. `PROJ-123`) to clipboard |
@@ -148,15 +150,17 @@ cp config.example.json ~/.config/jira-tui/config.json
 
 | Field | Purpose |
 |---|---|
+| `editor` | Command used by `e` to edit the description. String (`"code --wait"`, `"nvim"`) or array (`["code", "--wait"]`). Falls back to `$EDITOR`, then `code --wait`. GUI editors need a wait flag so the TUI resumes after you close the file. |
 | `keys` | Remap actions to blessed key names (`"c"`, `"S-w"`, `"C-c"`, `"tab"`, …). Each value is a string or array of keys. |
 | `tabs` | Detail-tab order (subset/reorder of `overview`, `comments`, `worklog`, `history`, `transitions`). Jump keys still target fixed tab ids. |
 | `tabLabels` | Display labels for detail tabs. |
 | `views` | List-tab labels and JQL for `mine` / `uat` (and label for `hidden`). |
 
-Example — custom Test/UAT JQL and comment key:
+Example — nvim as editor, custom Test/UAT JQL, and comment key:
 
 ```json
 {
+  "editor": "nvim",
   "keys": { "comment": ["C"] },
   "views": {
     "uat": {
@@ -166,6 +170,22 @@ Example — custom Test/UAT JQL and comment key:
   }
 }
 ```
+
+Other editor examples (string or array — both work; use an array if the
+binary path has spaces):
+
+- `"code --wait"` / `["code", "--wait"]` (package default)
+- `"cursor --wait"` / `["cursor", "--wait"]`
+- `"nvim"`, `"vim"`
+
+## Prompt for AI agents
+
+Ready-to-paste brief for coding agents:
+[`AGENTS.md`](AGENTS.md).
+
+In Cursor / similar tools you can also `@AGENTS.md` so the agent picks up
+local paths (`hidden.json`, `attachments/`, …), list views, and keybindings
+without guessing.
 
 ## Offline cache
 

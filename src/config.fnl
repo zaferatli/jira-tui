@@ -53,6 +53,10 @@
               :jql "\"Developer\" = currentUser() AND status in (Test, UAT, \"UAT Deployment\") ORDER BY updated DESC"}
         :hidden {:label "Hidden"}})
 
+;; Default when neither config.editor nor $EDITOR is set.
+;; Override per machine in ~/.config/jira-tui/config.json (e.g. "nvim").
+(local default-editor "code --wait")
+
 (fn config-dir []
   (let [os-mod (jsrequire "os")]
     (.. (os-mod:homedir) "/.config/jira-tui")))
@@ -145,15 +149,45 @@
         (let [(pok parsed) (pcall (fn [] (js.global.JSON:parse text)))]
           (if pok (js->lua parsed) nil)))))
 
+(fn normalize-editor [v]
+  "Parse editor config into [cmd arg ...] (e.g. [\"code\" \"--wait\"]).
+   Accepts a string (\"nvim\", \"code --wait\") or a JSON array."
+  (if (= (type v) "string")
+      (let [parts []]
+        (each [tok (string.gmatch v "%S+")]
+          (table.insert parts tok))
+        (if (> (length parts) 0) parts nil))
+      (and (= (type v) "table") (is-array? v) (> (length v) 0))
+      (let [parts []]
+        (each [_ x (ipairs v)]
+          (table.insert parts (tostring x)))
+        parts)
+      nil))
+
+(fn resolve-editor [raw-editor]
+  "Priority: config.editor → $EDITOR → code --wait."
+  (or (normalize-editor raw-editor)
+      (normalize-editor (. js.global.process.env "EDITOR"))
+      (normalize-editor default-editor)))
+
 (fn build-config [raw]
   (let [raw (or raw {})
         keys (normalize-keys (merge-maps default-keys (or raw.keys {})))
         tabs (normalize-tabs (or raw.tabs default-tabs))
         tab-labels (merge-maps default-tab-labels (or raw.tabLabels raw.tab_labels {}))
-        views (merge-maps default-views (or raw.views {}))]
-    {:keys keys :tabs tabs :tab-labels tab-labels :views views}))
+        views (merge-maps default-views (or raw.views {}))
+        editor (resolve-editor (or raw.editor raw.Editor))]
+    {:keys keys :tabs tabs :tab-labels tab-labels :views views :editor editor}))
 
 (local cfg (build-config (load-raw)))
+
+(fn editor []
+  "Command + args for description editing, e.g. [\"nvim\"] or [\"code\" \"--wait\"]."
+  cfg.editor)
+
+(fn editor-label []
+  "Short name for status/help (first token of the editor command)."
+  (or (. (editor) 1) default-editor))
 
 (fn keys-for [action]
   (or (. cfg.keys (action-name action)) []))
@@ -192,4 +226,5 @@
   (or (. cfg.tab-labels (action-name tab-id)) (action-name tab-id)))
 
 {: cfg : keys-for : format-keys : view-label : view-jql : tab-label
- : config-dir : config-path : default-keys : default-tabs}
+ : editor : editor-label
+ : config-dir : config-path : default-keys : default-tabs : default-editor}

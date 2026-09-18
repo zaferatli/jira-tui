@@ -32,7 +32,7 @@
         len (length s)]
     (if (>= len width) s (.. s (string.rep " " (- width len))))))
 
-;; nvim (like most editors) appends a trailing newline when saving; so when
+;; Editors often append a trailing newline when saving; so when
 ;; comparing/writing back against the original Jira description we ignore a
 ;; single trailing "\n" (we do not touch whitespace the user intentionally
 ;; wrote — only the one newline the editor added).

@@ -100,7 +100,7 @@
               ;; After a prompt closes, discard key events for a short window.
               ;; Multi-line terminal paste submits the textbox on the first \n;
               ;; the remaining characters would otherwise hit global bindings
-              ;; (e → nvim, q → quit, …) and tear down the TUI.
+              ;; (e → editor, q → quit, …) and tear down the TUI.
               :ignore-keys-until 0})
 
 ;; -------------------------------------------------------------------------
@@ -1094,17 +1094,54 @@
                                     (set-status! (.. "opening " (. links picked) "...")))
                                 (set-status! "cancelled."))))))))))))
 
+;; Open text in the configured editor (config.editor / $EDITOR / code --wait).
+;; Supports args (e.g. "code --wait") — blessed's readEditor only takes a
+;; single binary name, so we write a temp file and screen:exec ourselves.
+(fn read-with-editor! [name value cb]
+  (let [fs (jsrequire "fs")
+        os-mod (jsrequire "os")
+        parts (config.editor)
+        cmd (. parts 1)
+        ed-args []
+        rnd (string.sub (tostring (js.global.Math:random)) 3 10)
+        path (.. (os-mod:tmpdir) "/" name "." rnd)
+        opt (jsu.to-js {:stdio "inherit"
+                        :env js.global.process.env
+                        :cwd (os-mod:homedir)})]
+    (each [i p (ipairs parts)]
+      (when (> i 1) (table.insert ed-args p)))
+    (table.insert ed-args path)
+    (fn finish [err data]
+      (pcall (fn [] (fs:unlinkSync path)))
+      (cb err data))
+    (fn after-write [werr]
+      (if (and (not= werr nil) (not= werr js.null))
+          (finish werr nil)
+          (screen:exec
+           cmd (jsu.to-js ed-args) opt
+           (fn [_this eerr success]
+             (if (and (not= eerr nil) (not= eerr js.null))
+                 (finish eerr nil)
+                 (not success)
+                 (finish (js.new js.global.Error "Unsuccessful.") nil)
+                 (let [(rok raw) (pcall (fn [] (fs:readFileSync path "utf8")))]
+                   (if rok
+                       (finish nil raw)
+                       (finish raw nil))))))))
+    (fs:writeFile path (or value "") after-write)))
+
 (bind-keys!
  (config.keys-for :edit)
  (fn [_this]
    (if (not (current-issue-key))
        (set-status! "select an issue first")
        (let [key (current-issue-key)
-             original (render.field state.current-issue [:fields :description] "")]
-         (set-status! "opening nvim...")
-         (screen:readEditor
-          (jsu.to-js {:editor "nvim" :name (.. "jira-" key ".md") :value original})
-          (fn [_this err data]
+             original (render.field state.current-issue [:fields :description] "")
+             ed (config.editor-label)]
+         (set-status! (.. "opening " ed "..."))
+         (read-with-editor!
+          (.. "jira-" key ".md") original
+          (fn [err data]
             (if (and (not= err nil) (not= err js.null))
                 (set-status! (.. "ERROR: " (js.global:String err)))
                 (let [changed (fmt.rstrip-newline data)]
@@ -1120,7 +1157,6 @@
                                (do
                                  (when (= key (current-issue-key)) (load-issue! key))
                                  (set-status! "description updated.")))))))))))))))
-
 (bind-keys!
  (config.keys-for :help)
  (fn [_this]

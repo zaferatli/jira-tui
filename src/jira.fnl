@@ -170,7 +170,7 @@
   (let [body (.. "{\"name\":" (if (= username "") "null" (fmt.json-string username)) "}")]
     (put (.. "/rest/api/2/issue/" key "/assignee") body on-done)))
 
-;; Save description after editing in nvim:
+;; Save description after editing in the external editor:
 ;; PUT /issue/{key} body {"fields":{"description":"..."}}
 (fn update-description [key description on-done]
   (let [body (.. "{\"fields\":{\"description\":" (fmt.json-string description) "}}")]

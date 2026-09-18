@@ -18,7 +18,8 @@
         [:worklog "Log work on the selected issue (time + optional multiline comment)"]
         [:assign "Assign the selected issue (empty = unassign; optional multiline comment)"]
         [:assignSelf "Assign the selected issue to yourself"]
-        [:edit "Edit description in nvim - :wq saves to Jira if changed"]
+        [:edit (.. "Edit description in " (config.editor-label)
+                   " - save & close writes to Jira if changed")]
         [:hide "Hide the selected issue (unhide when in Hidden view)"]
         [:hideAll "Hide all visible issues (unhide all when in Hidden view)"]
         [:copyKey "Copy the selected issue key (e.g. PROJ-123) to clipboard"]
