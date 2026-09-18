@@ -1,0 +1,57 @@
+{
+  "keys": {
+    "comment": ["c"],
+    "browser": ["w"],
+    "worklog": ["S-w"],
+    "assign": ["a"],
+    "assignSelf": ["S-a"],
+    "edit": ["e"],
+    "hide": ["h"],
+    "hideAll": ["S-h"],
+    "copyKey": ["y"],
+    "copyDescription": ["d"],
+    "removeFromList": ["S-d"],
+    "attachments": ["i"],
+    "downloadAttachments": ["S-i"],
+    "links": ["l"],
+    "cycleListView": ["u", "tab"],
+    "jumpHidden": ["S-v"],
+    "openIssue": ["o"],
+    "bulkOpen": ["S-o"],
+    "search": ["s"],
+    "filter": ["/"],
+    "refresh": ["r"],
+    "help": ["?"],
+    "quit": ["q"],
+    "forceQuit": ["C-c"],
+    "focusToggle": ["S-tab"],
+    "prevTab": ["[", "left"],
+    "nextTab": ["]", "right"],
+    "tabOverview": ["1"],
+    "tabComments": ["2"],
+    "tabWorklog": ["3"],
+    "tabHistory": ["4"],
+    "tabTransitions": ["5", "t"]
+  },
+  "tabs": ["overview", "comments", "worklog", "history", "transitions"],
+  "tabLabels": {
+    "overview": "Overview",
+    "comments": "Comments",
+    "worklog": "Worklog",
+    "history": "History",
+    "transitions": "Transitions"
+  },
+  "views": {
+    "mine": {
+      "label": "Issues",
+      "jql": "assignee = currentUser() ORDER BY updated DESC"
+    },
+    "uat": {
+      "label": "Test/UAT",
+      "jql": "\"Developer\" = currentUser() AND status in (Test, UAT, \"UAT Deployment\") ORDER BY updated DESC"
+    },
+    "hidden": {
+      "label": "Hidden"
+    }
+  }
+}
