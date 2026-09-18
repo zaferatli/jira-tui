@@ -58,16 +58,12 @@ Requirements: Node.js; `nvim` for `e`; `open` / `pbcopy` on macOS for browser
 and clipboard shortcuts.
 
 ```sh
-git clone <this-repo>
-cd jira-tui
-npm install
+npm install jira-tui -g
 ```
-
-### Global install (`jira-tui` from any directory)
-
 ```sh
-npm install -g .
+yarn global add jira-tui
 ```
+
 
 ### Credentials
 
@@ -93,9 +89,6 @@ JIRA_PASSWORD=...
 
 ```sh
 jira-tui          # after global install, from any directory
-# or from the project:
-npm start
-node bin/jira-tui.js
 ```
 
 ## Keybindings
@@ -194,5 +187,4 @@ attachments live under `~/.config/jira-tui/attachments/`.
 
 ## License
 
-No license file yet — add a `LICENSE` (e.g. MIT) before publishing as open
-source.
+MIT Licence
